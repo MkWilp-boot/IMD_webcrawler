@@ -48,81 +48,71 @@ public class Main {
 				});
 			});
 		
-		String url = link_to_follow.get(0); // remover
-		
-		/**/
-		driver.get(url);
-		// doing this because jsoup does not parse the entire html by itself (dynamic content)
-		doc = Jsoup.parse(driver.getPageSource());
-		
-		Movie movie = new Movie();
-		// get movie title
-		String div_text = doc.getElementsByClass("OriginalTitle__OriginalTitleText-jz9bzr-0 llYePj")
-				.get(0)
-				.text();
-		// since the text comes like "Original title: Original movie title"
-		// we split the text with ":\s" and get the second item (index 1), which is the name
-		String title = div_text.split(": ")[1];
-		
-		movie.setName(title);
-		System.out.println(movie.getName());
-		
-		// getting the rating
-		Float rating = Float.parseFloat(
-					doc.getElementsByClass("AggregateRatingButton__RatingScore-sc-1ll29m0-1 iTLWoV")
-						.get(0)
-						.text()
-				);
-		movie.setRating(rating);
-		
-		// get directors
-		Element ul = doc.getElementsByClass("ipc-metadata-list-item__content-container").get(0);
-		ul.children().stream()
-			.forEach(li -> {
-				Elements links = li.getElementsByTag("a");
-				links.stream().forEach(link -> movie.addDirectors(link.text()));
-			});
-
-		// getting top cast
-		Element div_all_casts = doc.getElementsByClass("ipc-sub-grid ipc-sub-grid--page-span-2 ipc-sub-grid--wraps-at-above-l ipc-shoveler__grid").get(0);
-		
-		for (Element title_cast_item : div_all_casts.children()) {
-			String name = title_cast_item.getElementsByTag("a").get(0).attr("aria-label");
-			movie.addCast(name);
-		}
-		
-		// going to the review list
-		String user_review_link = BASE_URL + doc.getElementsByClass("UserReviewsHeader__Header-k61aee-0 egCnbs")
-				.get(0)
-				.child(0)
-				.attr("href")
-				.concat(ARGUMENT_FOR_ORDER);
-		
-		driver.get(user_review_link);
-		doc = Jsoup.parse(driver.getPageSource());
-		
-		// getting the list of reviews
-		// continue... lister-list
-		
-		driver.close();
-		System.exit(0);
-		
-		/**/
-		/*
 		for (String url : link_to_follow) {
 			driver.get(url);
+			// doing this because jsoup does not parse the entire html by itself (dynamic content)
 			doc = Jsoup.parse(driver.getPageSource());
 			
 			Movie movie = new Movie();
-			String title = doc.getElementsByClass("TitleHeader__TitleText-sc-1wu6n3d-0 cLNRlG")
+			// get movie title
+			String div_text = "";
+			
+			try {
+				div_text = doc.getElementsByClass("OriginalTitle__OriginalTitleText-jz9bzr-0 llYePj")
+						.get(0)
+						.text();
+				String title = div_text.split("Original title: ")[1];
+				movie.setName(title);
+			}
+			catch(IndexOutOfBoundsException e) {
+				div_text = doc.getElementsByClass("TitleHeader__TitleText-sc-1wu6n3d-0 dxSWFG")
+						.get(0)
+						.text();
+				movie.setName(div_text);
+			}
+			// since the text comes like "Original title: Original movie title"
+			// we split the text with ":\s" and get the second item (index 1), which is the name
+			
+			// getting the rating
+			Float rating = Float.parseFloat(
+						doc.getElementsByClass("AggregateRatingButton__RatingScore-sc-1ll29m0-1 iTLWoV")
+							.get(0)
+							.text()
+					);
+			movie.setRating(rating);
+			
+			// get directors
+			Element ul = doc.getElementsByClass("ipc-metadata-list-item__content-container").get(0);
+			ul.children().stream()
+				.forEach(li -> {
+					Elements links = li.getElementsByTag("a");
+					links.stream().forEach(link -> movie.addDirectors(link.text()));
+				});
+
+			// getting top cast
+			Element div_all_casts = doc.getElementsByClass("ipc-sub-grid ipc-sub-grid--page-span-2 ipc-sub-grid--wraps-at-above-l ipc-shoveler__grid").get(0);
+			
+			for (Element title_cast_item : div_all_casts.children()) {
+				String name = title_cast_item.getElementsByTag("a").get(0).attr("aria-label");
+				movie.addCast(name);
+			}
+			
+			// going to the review list
+			String user_review_link = BASE_URL + doc.getElementsByClass("UserReviewsHeader__Header-k61aee-0 egCnbs")
 					.get(0)
-					.text();
-			movie.setName(title);
-		
-			driver.close();
-			System.exit(0);
+					.child(0)
+					.attr("href")
+					.concat(ARGUMENT_FOR_ORDER);
+			
+			driver.get(user_review_link);
+			doc = Jsoup.parse(driver.getPageSource());
+			
+			// getting the list of reviews
+			// continue... lister-list
+			
+			System.out.println(movie.toString());
 		}
-		*/
-		
+		driver.close();
+		System.exit(0);
 	}
 }

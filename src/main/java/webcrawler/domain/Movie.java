@@ -70,5 +70,34 @@ public class Movie implements Serializable {
 		this.positive_comment = positive_comment;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("*-*-*-*-*-*-*-*-*-*-*-*-*-*\n");
+		sb.append("Movie: ")
+			.append(this.getName()).append('\n');
+		
+		sb.append("Rating: ")
+			.append(this.rating).append('\n');
+		
+		for (String director : this.getDirectors()) {
+			sb.append("Director Name: ")
+				.append(director).append('\n');
+		}
+		
+		for (String cast : this.getCast()) {
+			sb.append("Cast Name: ")
+				.append(cast).append('\n');
+		}
+		if (this.positive_comment == null) {
+			sb.append("Positive comment: "+"#NONE#").append('\n');
+		}
+		else {
+			sb.append("Positive comment: "+this.positive_comment).append('\n');
+		}
+		sb.append("*-*-*-*-*-*-*-*-*-*-*-*-*-*\n");
+		return sb.toString();
+	}
+
 	
 }
