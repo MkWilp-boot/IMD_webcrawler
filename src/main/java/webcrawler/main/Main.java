@@ -57,10 +57,15 @@ public class Main {
 		
 		Movie movie = new Movie();
 		// get movie title
-		String title = doc.getElementsByClass("TitleHeader__TitleText-sc-1wu6n3d-0 cLNRlG")
+		String div_text = doc.getElementsByClass("OriginalTitle__OriginalTitleText-jz9bzr-0 llYePj")
 				.get(0)
 				.text();
+		// since the text comes like "Original title: Original movie title"
+		// we split the text with ":\s" and get the second item (index 1), which is the name
+		String title = div_text.split(": ")[1];
+		
 		movie.setName(title);
+		System.out.println(movie.getName());
 		
 		// getting the rating
 		Float rating = Float.parseFloat(
